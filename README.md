@@ -36,7 +36,7 @@ owcs-korea/
 
 ### 🦝 Crazy Raccoon
 - **국가:** 일본 🇯🇵  
-- **주요 선수:** Ade, Dep, ta1yo 등  
+- **주요 선수:** "JunBin", "MAX", "LIP" , "HeeSang" , "SP1NT" , "shu" , "CH0R0NG" 등  
 - **주요 성적:** OWCS Stage 3 일본 대표 팀, 공격적인 플레이스타일  
 - **특징:** 일본을 대표하는 e스포츠 팀으로 FPS 종목에서 활약 중  
 
@@ -44,7 +44,7 @@ owcs-korea/
 
 ### 🔴 T1
 - **국가:** 대한민국 🇰🇷  
-- **주요 선수:** ANAMO, ILLICIT, MN3 등  
+- **주요 선수:** "DONGHAK", "Jasm1ne", "ZEST", "Proud", "Viper", "skewed", "vigilante" 등  
 - **주요 성적:** OWCS Stage 3 한국 대표 팀, 꾸준한 상위권 유지  
 - **특징:** 전통적인 명문 구단, 체계적인 팀 운영  
 
@@ -52,7 +52,7 @@ owcs-korea/
 
 ### 🦅 Team Falcons
 - **국가:** 사우디아라비아 🇸🇦  
-- **주요 선수:** KSA, Sharyk, MirroR 등  
+- **주요 선수:** "Hanbin", "SOMEONE", "Proper", "MER1T", "ChiYo", "Fielder" 등  
 - **주요 성적:** 중동·아프리카 지역 대표 팀  
 - **특징:** MENA 지역의 강력한 신흥 세력  
 
@@ -60,7 +60,7 @@ owcs-korea/
 
 ### ⚡ ZETA DIVISION
 - **국가:** 일본 🇯🇵  
-- **주요 선수:** Seicoe, Cucumber, Suna 등  
+- **주요 선수:** "BERNAR", "MAG", "AlphaYi", "Pelican", "Probe", "FiNN", "Bliss" 등  
 - **주요 성적:** OWCS Stage 3 상위권 진출  
 - **특징:** 공격적 운영과 유연한 로스터 교체로 유명  
 
