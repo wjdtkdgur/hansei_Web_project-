@@ -1,3 +1,10 @@
+🗂️ 폴더 구조 예시
+owcs-korea/
+│
+├── index.html
+├── style.css
+└── script.js
+
 # 🕹️ OWCS KOREA TEAM ROSTER PROJECT
 
 ## 📖 프로젝트 개요
