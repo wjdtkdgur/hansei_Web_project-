@@ -1,0 +1,226 @@
+// =========================================================
+// 🏆 OWCS KOREA TEAM DATA
+// =========================================================
+const teamData = {
+    // 로고 경로와 데이터는 이전과 동일
+    'Crazy Raccoon': { logo: 'images/logo_cr.png', players: [{ name: "JunBin", role: "Tank" }, { name: "MAX", role: "Tank" }, { name: "LIP", role: "DPS" }, { name: "HeeSang", role: "DPS" }, { name: "SP1NT", role: "DPS" }, { name: "shu", role: "Support" }, { name: "CH0R0NG", role: "Support" }] },
+    'T1': { logo: 'images/logo_t1.png', players: [{ name: "DONGHAK", role: "Tank" }, { name: "Jasm1ne", role: "Tank" }, { name: "ZEST", role: "DPS" }, { name: "Proud", role: "DPS" }, { name: "Viper", role: "DPS" }, { name: "skewed", role: "Support" }, { name: "vigilante", role: "Support" }] },
+    'Team Falcons': { logo: 'images/logo_tf.png', players: [{ name: "Hanbin", role: "Tank" }, { name: "SOMEONE", role: "Tank" }, { name: "Proper", role: "DPS" }, { name: "MER1T", role: "DPS" }, { name: "ChiYo", role: "Support" }, { name: "Fielder", role: "Support" }] },
+    'ZETA DIVISION': { logo: 'images/logo_zd.png', players: [{ name: "BERNAR", role: "Tank" }, { name: "MAG", role: "Tank" }, { name: "AlphaYi", role: "DPS" }, { name: "Pelican", role: "DPS" }, { name: "Probe", role: "DPS" }, { name: "FiNN", role: "Support" }, { name: "Bliss", role: "Support" }] }
+};
+
+const teamLogosContainer = document.getElementById('team-logos-container');
+const playerDetailSection = document.getElementById('player-detail-section');
+const detailTeamName = document.getElementById('detail-team-name');
+const playerCardsContainer = document.getElementById('player-cards-container');
+const dynamicLogo = document.getElementById('dynamic-logo');
+const heroZone = document.getElementById('hero-zone');
+
+
+// =========================================================
+// 1. Web Animations API (WAAPI) - 스크롤 등장 애니메이션
+// =========================================================
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1 // 뷰포트의 10%가 보일 때 애니메이션 실행
+};
+
+const fadeInKeyframes = [
+    { opacity: 0, transform: 'translateY(30px) scale(0.95)' },
+    { opacity: 1, transform: 'translateY(0) scale(1)' }
+];
+const fadeInTiming = { duration: 800, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' };
+
+const intersectionObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const delay = parseFloat(entry.target.getAttribute('data-delay')) || 0;
+
+            // WAAPI를 사용하여 애니메이션 실행
+            entry.target.animate(fadeInKeyframes, {
+                ...fadeInTiming,
+                delay: delay
+            });
+
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+
+// =========================================================
+// 2. 초기 팀 로고 카드 렌더링 및 WAAPI 등록
+// =========================================================
+function renderTeamLogos() {
+    let index = 0;
+    Object.keys(teamData).forEach(teamName => {
+        const teamInfo = teamData[teamName];
+        
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.setAttribute('data-team', teamName);
+        card.setAttribute('data-delay', index * 100); // 지연 시간 설정
+        card.innerHTML = `
+            <img src="${teamInfo.logo}" alt="${teamName} Logo">
+            <h4>${teamName}</h4>
+        `;
+        
+        card.addEventListener('click', () => showTeamDetails(teamName));
+        teamLogosContainer.appendChild(card);
+        
+        // WAAPI 옵저버에 등록
+        intersectionObserver.observe(card);
+        index++;
+    });
+}
+
+
+// =========================================================
+// 3. 팀 로고 클릭 시 상세 정보 표시
+// =========================================================
+function showTeamDetails(teamName) {
+    const teamInfo = teamData[teamName];
+    
+    detailTeamName.textContent = teamName;
+    playerCardsContainer.innerHTML = '';
+    
+    // 상세 섹션 초기화 후 표시
+    playerDetailSection.classList.remove('hidden');
+    
+    teamInfo.players.forEach((player, index) => {
+        const roleClass = `role-${player.role.toLowerCase()}`;
+        
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.setAttribute('data-delay', index * 50); // 선수 카드 등장 지연
+        
+        playerCard.innerHTML = `
+            <img src="images/player_${player.name.toLowerCase()}_placeholder.png" alt="${player.name} Photo">
+            <h5>${player.name}</h5>
+            <p>역할: <span class="role-tag ${roleClass}">${player.role}</span></p>
+        `;
+        playerCardsContainer.appendChild(playerCard);
+        
+        // 선수 카드 WAAPI 등록
+        intersectionObserver.observe(playerCard);
+    });
+    
+    // 스크롤을 상세 정보 섹션으로 부드럽게 이동
+    playerDetailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+
+// =========================================================
+// 4. 히어로 존 동적 로고 효과 (3D Tilt)
+// =========================================================
+const maxRotation = 10; 
+const logoElement = dynamicLogo.querySelector('img');
+
+function applyDynamicEffect(e) {
+    const rect = heroZone.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+
+    const centerX = x - 0.5; 
+    const centerY = y - 0.5;
+
+    const rotateY = centerX * maxRotation * 2; 
+    const rotateX = -centerY * maxRotation * 2; 
+
+    // CSS 변수 업데이트 (3D 변환)
+    dynamicLogo.style.setProperty('--rotate-X', `${rotateX}deg`);
+    dynamicLogo.style.setProperty('--rotate-Y', `${rotateY}deg`);
+    
+    dynamicLogo.classList.add('dynamic-glow');
+}
+
+function removeDynamicEffect() {
+    dynamicLogo.style.setProperty('--rotate-X', `0deg`);
+    dynamicLogo.style.setProperty('--rotate-Y', `0deg`);
+    dynamicLogo.classList.remove('dynamic-glow');
+}
+
+heroZone.addEventListener('mousemove', applyDynamicEffect);
+heroZone.addEventListener('mouseleave', removeDynamicEffect);
+
+
+// =========================================================
+// 5. 💡 Mouse Trail Effect (캔버스 기반)
+// =========================================================
+const canvas = document.getElementById('mouse-trail');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let mouse = { x: 0, y: 0 };
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = Math.random() * 2 + 1;
+        this.color = `rgba(255, 102, 0, ${Math.random() * 0.5 + 0.3})`; // 주황색 계열
+        this.velocity = { x: Math.random() * 0.5 - 0.25, y: Math.random() * 0.5 - 0.25 };
+        this.alpha = 1;
+    }
+
+    update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= 0.01; 
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color.replace('1)', `${this.alpha})`);
+        ctx.fill();
+        ctx.closePath();
+    }
+}
+
+function handleMouseMove(e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    
+    // 마우스 위치에 파티클 생성
+    for (let i = 0; i < 3; i++) {
+        particles.push(new Particle(mouse.x, mouse.y));
+    }
+}
+
+function animateParticles() {
+    requestAnimationFrame(animateParticles);
+    
+    // 배경을 옅게 덮어 잔상 효과 (Mouse Trail)
+    ctx.fillStyle = 'rgba(28, 28, 28, 0.05)'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        
+        // 투명도가 0보다 작아지면 제거
+        if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+            i--;
+        }
+    }
+}
+
+window.addEventListener('mousemove', handleMouseMove);
+window.addEventListener('resize', resizeCanvas);
+
+
+// =========================================================
+// 6. 초기 실행
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    resizeCanvas();
+    animateParticles();
+    renderTeamLogos();
+});
