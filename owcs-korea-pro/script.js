@@ -1,258 +1,135 @@
-/* 글로벌 설정 및 폰트 */
-:root {
-    --color-primary: #FF6600; /* 주황 */
-    --color-secondary: #0077B6; /* 파랑 */
-    --color-dark: #1C1C1C;
-    --color-light: #F4F4F9;
-    --color-dark-gray: #252525;
+// =========================================================
+// 🏆 OWCS KOREA TEAM DATA
+// =========================================================
+const teamData = {
+    // 로고 경로와 데이터는 이전과 동일
+    'Crazy Raccoon': { logo: '../images/logo_cr.webp', players: [{ name: "JunBin", role: "Tank" }, { name: "MAX", role: "Tank" }, { name: "LIP", role: "DPS" }, { name: "HeeSang", role: "DPS" }, { name: "SP1NT", role: "DPS" }, { name: "shu", role: "Support" }, { name: "CH0R0NG", role: "Support" }] },
+    'T1': { logo: '../images/logo_t1.png', players: [{ name: "DONGHAK", role: "Tank" }, { name: "Jasm1ne", role: "Tank" }, { name: "ZEST", role: "DPS" }, { name: "Proud", role: "DPS" }, { name: "Viper", role: "DPS" }, { name: "skewed", role: "Support" }, { name: "vigilante", role: "Support" }] },
+    'Team Falcons': { logo: '../images/logo_tf.png', players: [{ name: "Hanbin", role: "Tank" }, { name: "SOMEONE", role: "Tank" }, { name: "Proper", role: "DPS" }, { name: "MER1T", role: "DPS" }, { name: "ChiYo", role: "Support" }, { name: "Fielder", role: "Support" }] },
+    'ZETA DIVISION': { logo: '../images/logo_zd.png', players: [{ name: "BERNAR", role: "Tank" }, { name: "MAG", role: "Tank" }, { name: "AlphaYi", role: "DPS" }, { name: "Pelican", role: "DPS" }, { name: "Probe", role: "DPS" }, { name: "FiNN", role: "Support" }, { name: "Bliss", role: "Support" }] }
+};
+
+const teamLogosContainer = document.getElementById('team-logos-container');
+const playerDetailSection = document.getElementById('player-detail-section');
+const detailTeamName = document.getElementById('detail-team-name');
+const playerCardsContainer = document.getElementById('player-cards-container');
+const dynamicLogo = document.getElementById('dynamic-logo');
+const heroZone = document.getElementById('hero-zone');
+
+
+// =========================================================
+// 1. Web Animations API (WAAPI) - 스크롤 등장 애니메이션
+// =========================================================
+const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1 // 뷰포트의 10%가 보일 때 애니메이션 실행
+};
+
+const fadeInKeyframes = [
+    { opacity: 0, transform: 'translateY(30px) scale(0.95)' },
+    { opacity: 1, transform: 'translateY(0) scale(1)' }
+];
+const fadeInTiming = { duration: 800, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' };
+
+const intersectionObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const delay = parseFloat(entry.target.getAttribute('data-delay')) || 0;
+
+            // WAAPI를 사용하여 애니메이션 실행
+            entry.target.animate(fadeInKeyframes, {
+                ...fadeInTiming,
+                delay: delay
+            });
+
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+
+// =========================================================
+// 2. 초기 팀 로고 카드 렌더링 및 WAAPI 등록
+// =========================================================
+function renderTeamLogos() {
+    let index = 0;
+    Object.keys(teamData).forEach(teamName => {
+        const teamInfo = teamData[teamName];
+        
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.setAttribute('data-team', teamName);
+        card.setAttribute('data-delay', index * 100); // 지연 시간 설정
+        card.innerHTML = `
+            <img src="${teamInfo.logo}" alt="${teamName} Logo" onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';">
+            <h4>${teamName}</h4>
+        `;
+        
+        card.addEventListener('click', () => showTeamDetails(teamName));
+        teamLogosContainer.appendChild(card);
+        
+        // WAAPI 옵저버에 등록
+        intersectionObserver.observe(card);
+        index++;
+    });
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
 
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    line-height: 1.6;
-    color: var(--color-light);
-    background-color: var(--color-dark);
-    scroll-behavior: smooth;
-    /* Parallax 효과를 위해 필요: 스크롤 영역 설정 */
-    height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    perspective: 1px; /* 깊이감 설정 */
-}
-
-/* ---------------------------------------------------- */
-/* 🌌 PARALLAX SCROLL & MOUSE TRAIL */
-/* ---------------------------------------------------- */
-
-/* Mouse Trail 캔버스 */
-#mouse-trail {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100; /* 최상단 */
-    pointer-events: none; /* 마우스 이벤트 무시 */
-}
-
-/* Parallax 배경 */
-.parallax-bg {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    /* 배경을 뒤로 밀어 스크롤 시 느리게 움직이게 함 */
-    transform: translateZ(-1px) scale(2); 
-    z-index: -10;
-}
-
-/* 모든 콘텐츠를 묶는 컨테이너 (스크롤 가능) */
-header, main, footer {
-    position: relative;
-    z-index: 1; 
-    /* Parallax 배경과 동일한 transform을 받지 않도록 격리 */
-    transform-style: preserve-3d; 
-}
-
-
-/* ---------------------------------------------------- */
-/* 🌟 HERO ZONE STYLES */
-/* ---------------------------------------------------- */
-#hero-zone {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    overflow: hidden;
-    padding-top: 50px; /* Header 공간 확보 */
-}
-
-.hero-content {
-    z-index: 10;
-}
-
-#dynamic-logo {
-    position: relative;
-    display: inline-block;
-    transition: transform 0.3s ease;
-    cursor: pointer;
-    /* JS에서 업데이트할 변수 초기화 */
-    --rotate-X: 0deg;
-    --rotate-Y: 0deg;
-}
-
-#dynamic-logo img {
-    width: 90vw;
-    max-width: 500px;
-    height: auto;
-    object-fit: contain;
-    padding: 20px;
-    transition: filter 0.5s ease, transform 0.1s linear;
+// =========================================================
+// 3. 팀 로고 클릭 시 상세 정보 표시
+// =========================================================
+function showTeamDetails(teamName) {
+    const teamInfo = teamData[teamName];
     
-    transform: perspective(1000px) rotateX(var(--rotate-X)) rotateY(var(--rotate-Y));
+    detailTeamName.textContent = teamName;
+    playerCardsContainer.innerHTML = '';
+    
+    // 상세 섹션 초기화 후 표시
+    playerDetailSection.classList.remove('hidden');
+    
+    teamInfo.players.forEach((player, index) => {
+        const roleClass = `role-${player.role.toLowerCase()}`;
+        
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.setAttribute('data-delay', index * 50); // 선수 카드 등장 지연
+        
+        playerCard.innerHTML = `
+            <img src="../images/player_default_placeholder.png" alt="${player.name} Photo" onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';">
+            <h5>${player.name}</h5>
+            <p>역할: <span class="role-tag ${roleClass}">${player.role}</span></p>
+        `;
+        playerCardsContainer.appendChild(playerCard);
+        
+        // 선수 카드 WAAPI 등록
+        intersectionObserver.observe(playerCard);
+    });
+    
+    // 스크롤을 상세 정보 섹션으로 부드럽게 이동
+    playerDetailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-.dynamic-glow img {
-    filter: drop-shadow(0 0 35px rgba(255, 102, 0, 1)) brightness(1.2);
-}
 
-.subtitle {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: #ccc;
-    margin-top: 25px;
-}
+// =========================================================
+// 4. 히어로 존 동적 로고 효과 (3D Tilt) - 비활성화
+// =========================================================
+// 마우스 기반 로고 틸트와 글로우 효과는 디자인에서 제거했습니다.
+// 이전에 사용하던 event listeners 및 관련 로직을 모두 제거하여
+// 불필요한 연산과 상호작용을 중단합니다.
 
-.scroll-link {
-    /* ... (스타일 유지) ... */
-    display: inline-block;
-    margin-top: 30px;
-    padding: 12px 30px;
-    background-color: var(--color-primary);
-    color: var(--color-dark);
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: 50px;
-    transition: background-color 0.3s, transform 0.3s;
-    animation: bounce 1.5s infinite; /* 부드러운 애니메이션 유지 */
-}
 
-.scroll-link:hover {
-    background-color: #e65c00;
-    transform: translateY(-3px);
-}
+// =========================================================
+// 5. Mouse Trail Effect (캔버스 기반) - 비활성화
+// =========================================================
+// 마우스 잔상(파티클) 효과는 사용자 요청에 따라 제거했습니다.
+// 관련 캔버스 렌더링 및 이벤트 핸들러를 삭제하여 성능에
+// 불필요한 부하를 주지 않습니다.
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
-}
 
-/* ---------------------------------------------------- */
-/* 🏆 TEAM ROSTER SECTION & PLAYER DETAIL */
-/* ---------------------------------------------------- */
-#team-roster-section {
-    padding: 100px 5%;
-    background-color: var(--color-dark);
-}
-
-.section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 60px;
-    color: var(--color-primary);
-    position: relative;
-}
-
-.team-logos-container {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
-    margin-bottom: 80px;
-}
-
-/* 팀 로고 카드 */
-.team-card {
-    background: var(--color-dark-gray);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    width: 220px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    opacity: 0; /* WAAPI 애니메이션을 위해 초기 투명도 설정 */
-}
-
-.team-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.4);
-    border-color: var(--color-primary);
-}
-
-.team-card img {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
-    margin-bottom: 15px;
-    border-radius: 8px;
-}
-
-/* ... (나머지 .player-card, .role-tag 등은 이전과 동일하게 유지) ... */
-
-#player-detail-section {
-    padding: 40px;
-    background-color: #101010;
-    border-radius: 15px;
-    min-height: 500px;
-    margin-top: 50px;
-}
-
-#detail-team-name {
-    text-align: center;
-    font-size: 3rem;
-    color: var(--color-secondary);
-    margin-bottom: 40px;
-    text-transform: uppercase;
-    font-family: 'Montserrat', sans-serif;
-    text-shadow: 0 0 10px rgba(0, 119, 182, 0.5);
-}
-
-#player-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    justify-content: center;
-}
-
-.player-card {
-    background: #202020;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    border-left: 5px solid var(--color-primary);
-    opacity: 0; /* WAAPI 애니메이션을 위해 초기 투명도 설정 */
-}
-
-/* 역할별 색상 (이전 코드에서 가져오세요) */
-.role-tank { background-color: #F89B2B; color: var(--color-dark); }
-.role-dps { background-color: #E84964; color: var(--color-dark); }
-.role-support { background-color: #00B171; color: var(--color-dark); }
-
-.hidden {
-    display: none;
-}
-
-/* ---------------------------------------------------- */
-/* 📱 반응형 디자인 (모바일 최적화) */
-/* ---------------------------------------------------- */
-@media (max-width: 768px) {
-    .section-title {
-        font-size: 2rem;
-    }
-    #dynamic-logo img {
-        width: 100%;
-        max-width: 400px;
-    }
-    .team-logos-container {
-        gap: 20px;
-    }
-    .team-card {
-        width: 45%; /* 모바일에서 2열 배치 */
-    }
-    #detail-team-name {
-        font-size: 2rem;
-    }
-}
+// =========================================================
+// 6. 초기 실행
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    renderTeamLogos();
+});
