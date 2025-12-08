@@ -132,4 +132,65 @@ function showTeamDetails(teamName) {
 // =========================================================
 document.addEventListener('DOMContentLoaded', () => {
     renderTeamLogos();
+    // 부드러운 스크롤: '팀 로스터 보기' 버튼 클릭 시
+    const scrollLink = document.querySelector('.scroll-link');
+    const rosterSection = document.getElementById('team-roster-section');
+    if (scrollLink && rosterSection) {
+        scrollLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            rosterSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+    // 시작할 때 히어로 애니메이션 초기화
+    try {
+        initHeroAnimation();
+    } catch (err) {
+        // 안전 장치: 실패해도 페이지는 정상 동작
+        console.warn('Hero animation init failed', err);
+    }
 });
+
+
+/* =========================================================
+   Hero animation: lightweight parallax + activation
+   - Adds `hero-animate` class to body to start CSS animations
+   - Adds subtle mousemove parallax on #dynamic-logo (rAF)
+   ========================================================= */
+function initHeroAnimation() {
+    // add class to trigger CSS entrance/float/glint
+    document.body.classList.add('hero-animate');
+
+    // lightweight parallax using requestAnimationFrame
+    if (!heroZone || !dynamicLogo) return;
+
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+    let rafId = null;
+
+    function onMove(e) {
+        const r = heroZone.getBoundingClientRect();
+        const px = ((e.clientX - r.left) / r.width) - 0.5; // -0.5 .. 0.5
+        const py = ((e.clientY - r.top) / r.height) - 0.5;
+        // small angles
+        targetX = px * 8; // yaw
+        targetY = py * 6; // pitch
+        if (!rafId) rafId = requestAnimationFrame(animateLogo);
+    }
+
+    function animateLogo() {
+        // simple easing
+        currentX += (targetX - currentX) * 0.12;
+        currentY += (targetY - currentY) * 0.12;
+        // apply transform (rotateY, rotateX) and slight translateZ for depth
+        dynamicLogo.style.transform = `perspective(900px) rotateY(${currentX}deg) rotateX(${ -currentY }deg) translateZ(10px)`;
+        rafId = null;
+    }
+
+    function onLeave() {
+        targetX = 0; targetY = 0;
+        if (!rafId) rafId = requestAnimationFrame(animateLogo);
+    }
+
+    heroZone.addEventListener('mousemove', onMove, { passive: true });
+    heroZone.addEventListener('mouseleave', onLeave);
+}

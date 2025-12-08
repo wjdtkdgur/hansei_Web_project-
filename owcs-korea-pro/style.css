@@ -5,6 +5,9 @@
     --color-dark: #1C1C1C;
     --color-light: #F4F4F9;
     --color-dark-gray: #252525;
+    --accent-gradient: linear-gradient(90deg, #FF6600 0%, #FFB86B 60%);
+    --panel-gradient: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+    --muted: rgba(244,244,249,0.65);
 }
 
 * {
@@ -18,6 +21,7 @@ body {
     line-height: 1.6;
     color: var(--color-light);
     background-color: var(--color-dark);
+    background-image: radial-gradient(circle at 10% 10%, rgba(255,102,0,0.03), transparent 10%), radial-gradient(circle at 90% 90%, rgba(0,119,182,0.02), transparent 12%);
     scroll-behavior: smooth;
     /* Parallax 효과를 위해 필요: 스크롤 영역 설정 */
     height: 100vh;
@@ -72,6 +76,112 @@ header, main, footer {
     text-align: center;
     overflow: hidden;
     padding-top: 50px; /* Header 공간 확보 */
+}
+
+/* ---------------------------------------------------- */
+/* ✦ Hero animation (glint, float, background drift)    */
+/* Lightweight, performant CSS + small mouse parallax    */
+/* ---------------------------------------------------- */
+
+#hero-zone {
+    overflow: hidden; /* ensure pseudo layers stay inside */
+}
+
+/* subtle animated overlay (diagonal drift) */
+#hero-zone::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    background-image: linear-gradient(120deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.00) 30%, rgba(0,0,0,0.02) 60%, rgba(0,0,0,0.04) 100%);
+    opacity: 0.55;
+    transform-origin: center;
+    animation: hero-bg-drift 12s linear infinite;
+}
+
+@keyframes hero-bg-drift {
+    0% { transform: translate3d(-6%, -6%, 0) rotate(0deg); }
+    50% { transform: translate3d(6%, 6%, 0) rotate(1deg); }
+    100% { transform: translate3d(-6%, -6%, 0) rotate(0deg); }
+}
+
+/* dynamic logo container: will receive transforms from JS and CSS */
+#dynamic-logo {
+    will-change: transform;
+    transition: transform 280ms cubic-bezier(.2,.9,.3,1);
+    transform-style: preserve-3d;
+}
+
+/* glint effect: using pseudo-element on the wrapper */
+#dynamic-logo::after {
+    content: "";
+    position: absolute;
+    left: -40%;
+    top: -10%;
+    width: 200%;
+    height: 120%;
+    pointer-events: none;
+    transform: skewX(-18deg) translateX(-110%);
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 48%, rgba(255,255,255,0) 100%);
+    mix-blend-mode: screen;
+    opacity: 0.9;
+}
+
+/* apply entrance and floating motion when 'hero-animate' class is added to body */
+.hero-animate #dynamic-logo {
+    animation: hero-entrance 700ms cubic-bezier(.2,.9,.3,1) both, hero-float 6s ease-in-out 700ms infinite;
+}
+
+@keyframes hero-entrance {
+    0% { opacity: 0; transform: translateY(22px) scale(0.98) rotateX(0.5deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); }
+}
+
+@keyframes hero-float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+/* glint sweep timing when hero active */
+.hero-animate #dynamic-logo::after {
+    animation: glint-sweep 2.4s cubic-bezier(.4,.0,.2,1) 1.2s both;
+}
+
+@keyframes glint-sweep {
+    0% { transform: skewX(-18deg) translateX(-110%); opacity: 0; }
+    10% { opacity: 0.9; }
+    50% { transform: skewX(-18deg) translateX(0%); opacity: 0.95; }
+    100% { transform: skewX(-18deg) translateX(110%); opacity: 0; }
+}
+
+/* quick subtle vignette to increase contrast on the edges */
+#hero-zone::before { opacity: 0.9; transition: opacity 1s ease-in-out; }
+.hero-animate #hero-zone::before { opacity: 0.65; }
+
+/* Overwatch-inspired header background: 밝은 중앙 -> 외곽으로 진해지는 그라데이션 */
+#hero-zone {
+    /* 중심은 밝은 흰색, 외곽으로 갈수록 어두운 톤으로 전환 */
+    background: radial-gradient(circle at center, rgba(255,255,255,0.98) 0%, rgba(252,252,252,0.92) 8%, rgba(245,245,246,0.84) 14%, rgba(230,235,240,0.7) 22%, rgba(30,40,48,0.18) 55%, rgba(8,14,20,1) 100%);
+    position: relative;
+    border-bottom: 4px solid rgba(255,102,0,0.08);
+}
+
+#hero-zone::before {
+    /* subtle orange arc near the top to hint Overwatch logo accent */
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 18px;
+    transform: translateX(-50%);
+    width: 420px;
+    height: 36px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 50%, rgba(255,102,0,0.95) 0%, rgba(255,102,0,0.6) 40%, rgba(255,102,0,0.12) 70%, transparent 100%);
+    filter: blur(8px);
+    opacity: 0.95;
+    pointer-events: none;
 }
 
 .hero-content {
@@ -202,7 +312,7 @@ header, main, footer {
 #detail-team-name {
     text-align: center;
     font-size: 3rem;
-    color: var(--color-secondary);
+    color: #ffffff; /* 팀 상세 제목은 클릭 시 항상 흰색으로 표시 */
     margin-bottom: 40px;
     text-transform: uppercase;
     font-family: 'Montserrat', sans-serif;
@@ -256,3 +366,183 @@ header, main, footer {
         font-size: 2rem;
     }
 }
+
+/* Overwatch-like typography tweaks */
+h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+}
+
+/* Hero vibe */
+#hero-zone .hero-content {
+    text-align: center;
+    color: var(--color-light);
+}
+
+.subtitle {
+    font-size: 1.6rem;
+    color: rgba(10,18,24,0.85); /* 밝은 중앙에 맞춰 다크 텍스트 */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+}
+
+#dynamic-logo img {
+    width: 60vw;
+    max-width: 540px;
+    transition: transform 0.15s ease, filter 0.25s ease;
+    filter: drop-shadow(0 30px 60px rgba(4,8,12,0.55));
+}
+
+/* Hero content: 중앙이 밝아도 텍스트는 어둡게 보여야 함 */
+#hero-zone .hero-content { color: rgba(8,12,16,0.95); }
+
+.scroll-link {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 34px;
+    background: var(--accent-gradient);
+    color: #111020;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 8px 30px rgba(255,102,0,0.12), 0 2px 6px rgba(0,0,0,0.6) inset;
+    letter-spacing: 0.6px;
+}
+
+.scroll-link:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 18px 48px rgba(255,102,0,0.18);
+}
+
+/* Section titles */
+.section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    text-shadow: 0 4px 14px rgba(255,102,0,0.06);
+}
+
+/* Team cards styled like Overwatch sponsor tiles */
+.team-card {
+    background: var(--panel-gradient);
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02) inset;
+    text-align: center;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.18s ease;
+    width: 260px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.02);
+    opacity: 1; /* show immediately but animate in with WAAPI */
+}
+
+.team-card img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+    padding: 8px;
+}
+
+.team-card h4 {
+    margin-top: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--color-light);
+    font-size: 1.05rem;
+}
+
+.team-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 80px rgba(255,102,0,0.12), 0 8px 20px rgba(0,0,0,0.7);
+    border-color: rgba(255,102,0,0.12);
+}
+
+/* Player cards */
+.player-card {
+    background: linear-gradient(180deg, #171717, #111111);
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    border-left: 6px solid rgba(255,102,0,0.85);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.player-card img { width: 92px; height:92px; border-radius:999px; object-fit:cover; margin-bottom:12px; }
+.player-card h5 { margin:4px 0; font-weight:700; color:var(--color-light); }
+.role-tag { padding:6px 10px; border-radius:999px; font-weight:700; display:inline-block; margin-top:8px; }
+
+.player-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(0,0,0,0.7); }
+
+/* small helper for muted text */
+.text-muted { color: var(--muted); }
+
+/* ---------------------------------------------------- */
+/* Additional premium Overwatch-like refinements */
+/* ---------------------------------------------------- */
+:root {
+    --accent-dark: #cc5200;
+    --panel-edge: rgba(255,255,255,0.03);
+}
+
+/* Big hero title feel when present (if you add an h1/h2) */
+#hero-zone .hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 4.5vw, 4rem);
+    color: #FFF;
+    -webkit-text-stroke: 1px rgba(0,0,0,0.45);
+    text-shadow: 0 8px 30px rgba(255,102,0,0.08), 0 2px 6px rgba(0,0,0,0.6);
+    letter-spacing: 1.6px;
+    margin-bottom: 8px;
+}
+
+/* subtle vignette for premium depth */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(50% 35% at 50% 20%, rgba(255,102,0,0.02), transparent 10%),
+                radial-gradient(70% 60% at 50% 100%, rgba(0,0,0,0.18), transparent 40%);
+    mix-blend-mode: overlay;
+}
+
+/* small metallic divider used under titles */
+.section-title::after {
+    content: '';
+    display: block;
+    width: 88px;
+    height: 6px;
+    margin: 18px auto 0;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,140,60,0.18), rgba(255,255,255,0.06));
+    box-shadow: 0 6px 18px rgba(255,102,0,0.06);
+}
+
+/* make headings feel stamped */
+h2, h3, h4 {
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+/* small responsive tweak for team cards to keep clean spacing */
+@media (min-width: 1280px) {
+    .team-card { width: 300px; }
+}
+
+/* Accessibility: strong focus outline for keyboard users */
+a:focus, button:focus {
+    outline: 3px solid rgba(255,102,0,0.18);
+    outline-offset: 4px;
+}
+
+/* Footer subtle tone */
+footer { color: var(--muted); font-size:0.9rem; padding:28px 0; text-align:center; }
