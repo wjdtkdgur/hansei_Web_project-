@@ -123,9 +123,10 @@ header, main, footer {
     height: 120%;
     pointer-events: none;
     transform: skewX(-18deg) translateX(-110%);
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 48%, rgba(255,255,255,0) 100%);
+    /* reduced peak brightness */
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.28) 48%, rgba(255,255,255,0) 100%);
     mix-blend-mode: screen;
-    opacity: 0.9;
+    opacity: 0.65;
 }
 
 /* apply entrance and floating motion when 'hero-animate' class is added to body */
@@ -146,13 +147,15 @@ header, main, footer {
 
 /* glint sweep timing when hero active */
 .hero-animate #dynamic-logo::after {
-    animation: glint-sweep 2.4s cubic-bezier(.4,.0,.2,1) 1.2s both;
+    /* 1s interval: 1s sweep + 1s rest (2s total duration) */
+    animation: glint-sweep 2.0s linear 0s infinite;
 }
 
 @keyframes glint-sweep {
     0% { transform: skewX(-18deg) translateX(-110%); opacity: 0; }
-    10% { opacity: 0.9; }
-    50% { transform: skewX(-18deg) translateX(0%); opacity: 0.95; }
+    5% { opacity: 0.45; }
+    25% { transform: skewX(-18deg) translateX(0%); opacity: 0.5; }
+    50% { transform: skewX(-18deg) translateX(110%); opacity: 0; }
     100% { transform: skewX(-18deg) translateX(110%); opacity: 0; }
 }
 
