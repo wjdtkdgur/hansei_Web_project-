@@ -3,10 +3,10 @@
 // =========================================================
 const teamData = {
     // 로고 경로와 데이터는 이전과 동일
-    'Crazy Raccoon': { logo: 'images/logo_cr.webp', players: [{ name: "JunBin", role: "Tank" }, { name: "MAX", role: "Tank" }, { name: "LIP", role: "DPS" }, { name: "HeeSang", role: "DPS" }, { name: "SP1NT", role: "DPS" }, { name: "shu", role: "Support" }, { name: "CH0R0NG", role: "Support" }] },
-    'T1': { logo: 'images/logo_t1.png', players: [{ name: "DONGHAK", role: "Tank" }, { name: "Jasm1ne", role: "Tank" }, { name: "ZEST", role: "DPS" }, { name: "Proud", role: "DPS" }, { name: "Viper", role: "DPS" }, { name: "skewed", role: "Support" }, { name: "vigilante", role: "Support" }] },
-    'Team Falcons': { logo: 'images/logo_tf.png', players: [{ name: "Hanbin", role: "Tank" }, { name: "SOMEONE", role: "Tank" }, { name: "Proper", role: "DPS" }, { name: "MER1T", role: "DPS" }, { name: "ChiYo", role: "Support" }, { name: "Fielder", role: "Support" }] },
-    'ZETA DIVISION': { logo: 'images/logo_zd.png', players: [{ name: "BERNAR", role: "Tank" }, { name: "MAG", role: "Tank" }, { name: "AlphaYi", role: "DPS" }, { name: "Pelican", role: "DPS" }, { name: "Probe", role: "DPS" }, { name: "FiNN", role: "Support" }, { name: "Bliss", role: "Support" }] }
+    'Crazy Raccoon': { logo: './images/logo_cr.webp', players: [{ name: "JunBin", role: "Tank" }, { name: "MAX", role: "Tank" }, { name: "LIP", role: "DPS" }, { name: "HeeSang", role: "DPS" }, { name: "SP1NT", role: "DPS" }, { name: "shu", role: "Support" }, { name: "CH0R0NG", role: "Support" }] },
+    'T1': { logo: './images/logo_t1.png', players: [{ name: "DONGHAK", role: "Tank" }, { name: "Jasm1ne", role: "Tank" }, { name: "ZEST", role: "DPS" }, { name: "Proud", role: "DPS" }, { name: "Viper", role: "DPS" }, { name: "skewed", role: "Support" }, { name: "vigilante", role: "Support" }] },
+    'Team Falcons': { logo: './images/logo_tf.png', players: [{ name: "Hanbin", role: "Tank" }, { name: "SOMEONE", role: "Tank" }, { name: "Proper", role: "DPS" }, { name: "MER1T", role: "DPS" }, { name: "ChiYo", role: "Support" }, { name: "Fielder", role: "Support" }] },
+    'ZETA DIVISION': { logo: './images/logo_zd.png', players: [{ name: "BERNAR", role: "Tank" }, { name: "MAG", role: "Tank" }, { name: "AlphaYi", role: "DPS" }, { name: "Pelican", role: "DPS" }, { name: "Probe", role:"DPS"}, { name:"FiNN",role:"Support"},{name:"Bliss",role:"Support"}]}
 };
 
 const teamLogosContainer = document.getElementById('team-logos-container');
@@ -96,7 +96,7 @@ function showTeamDetails(teamName) {
         playerCard.setAttribute('data-delay', index * 50); // 선수 카드 등장 지연
         
         playerCard.innerHTML = `
-            <img src="images/player_default_placeholder.png" alt="${player.name} Photo" onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';">
+            <img src="./images/player_default_placeholder.png" alt="${player.name} Photo" onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';">
             <h5>${player.name}</h5>
             <p>역할: <span class="role-tag ${roleClass}">${player.role}</span></p>
         `;
@@ -193,5 +193,4 @@ function initHeroAnimation() {
 
     heroZone.addEventListener('mousemove', onMove, { passive: true });
     heroZone.addEventListener('mouseleave', onLeave);
-
 }
